@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wsparcie — BitPLN</title>
+<title>Wsparcie — Outpost</title>
 <style>
     :root {
         color-scheme: light dark;
@@ -34,7 +34,7 @@
         margin-bottom: 2rem;
     }
     a {
-        color: #ff9500;
+        color: #0a84ff;
     }
     .card {
         border: 1px solid #e5e5ea;
@@ -42,6 +42,12 @@
         border-radius: 12px;
         padding: 16px 20px;
         margin: 1.5rem 0;
+    }
+    code {
+        font-size: 0.9em;
+        background: rgba(127, 127, 127, 0.15);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
     }
     ul {
         padding-left: 1.25rem;
@@ -61,7 +67,7 @@
             background: #000000;
         }
         a {
-            color: #ff9f0a;
+            color: #0a84ff;
         }
         .card {
             background: #1c1c1e;
@@ -72,35 +78,60 @@
 </head>
 <body>
 
-<h1>Wsparcie — BitPLN</h1>
+<h1>Wsparcie — Outpost</h1>
 <p class="subtitle">Pomoc, pytania i zgłaszanie problemów</p>
 
 <div class="card">
-    Masz pytanie, sugestię albo napotkałeś błąd w aplikacji BitPLN? Napisz do mnie
+    Masz pytanie, sugestię albo napotkałeś błąd w aplikacji Outpost? Napisz do mnie
     bezpośrednio: <a href="mailto:marek.otulakowski@gmail.com">marek.otulakowski@gmail.com</a>.
     Odpisuję zwykle w ciągu kilku dni.
 </div>
 
 <h2>Najczęstsze pytania</h2>
 
-<p><strong>Aplikacja pokazuje "Błąd ładowania danych" — co robić?</strong></p>
+<p><strong>Endpoint pokazuje "Unreachable" — co robić?</strong></p>
 <p>
-    Sprawdź połączenie z internetem (Wi-Fi lub dane komórkowe) i spróbuj ponownie za
-    pomocą przycisku "Odśwież" na ekranie głównym. Aplikacja korzysta z publicznych,
-    darmowych API (CoinGecko i NBP), które czasem mogą być chwilowo niedostępne.
+    Sprawdź, czy serwer jest włączony i osiągalny w sieci z Twojego urządzenia (ten sam
+    Wi-Fi/VPN co serwer, albo publicznie dostępny adres), oraz czy dane logowania
+    (klucz SSH, hasło, token API) w ustawieniach endpointu są aktualne. Możesz to
+    sprawdzić przyciskiem "Test connection" w edycji endpointu.
 </p>
 
-<p><strong>Nie otrzymuję powiadomień, mimo że je włączyłem.</strong></p>
+<p><strong>Widzę ostrzeżenie o zmianie tożsamości serwera (host key / certyfikat) — co to znaczy?</strong></p>
 <p>
-    Sprawdź, czy powiadomienia dla BitPLN są włączone w Ustawieniach systemowych iOS
-    (Ustawienia → BitPLN → Powiadomienia), oraz czy w samej aplikacji, w zakładce
-    Ustawienia, zapisałeś wybraną godzinę przyciskiem "Zapisz ustawienia".
+    Outpost zapamiętuje ("przypina") odcisk palca klucza SSH albo certyfikatu TLS
+    Twojego serwera przy pierwszym połączeniu. Jeśli ten odcisk się zmieni, dostajesz
+    ostrzeżenie — to zwykle efekt reinstalacji systemu albo odnowienia certyfikatu na
+    serwerze, ale to też dokładnie ten mechanizm chroni Cię przed podszywaniem się pod
+    Twój serwer. Jeśli sam świadomie zmieniłeś serwer, zaakceptuj nowy odcisk w
+    aplikacji.
+</p>
+
+<p><strong>Czym są endpointy "Demo — Linux VPS" i "Demo — Windows Server"?</strong></p>
+<p>
+    To dwa przykładowe wpisy dodawane automatycznie przy pierwszym uruchomieniu (albo
+    gdy lista endpointów jest pusta), żeby od razu zobaczyć jak wygląda działający
+    dashboard. Pokazują lokalnie wygenerowane, przykładowe dane — nie łączą się z
+    żadnym prawdziwym serwerem ani siecią. Możesz je swobodnie usunąć.
+</p>
+
+<p><strong>Nie widzę sekcji IIS / MSSQL na moim serwerze Windows.</strong></p>
+<p>
+    Te sekcje pojawiają się tylko, jeśli na monitorowanym serwerze faktycznie
+    zainstalowano rolę IIS albo SQL Server — jeśli ich nie ma, Outpost po prostu ukrywa
+    odpowiednią sekcję zamiast pokazywać błąd.
+</p>
+
+<p><strong>Jak zmienić język aplikacji?</strong></p>
+<p>
+    Ustawienia → Język. Zmiana wymaga ponownego uruchomienia aplikacji, żeby w pełni
+    się zastosowała.
 </p>
 
 <p><strong>Gdzie są przechowywane moje dane?</strong></p>
 <p>
-    Wyłącznie lokalnie na Twoim urządzeniu — więcej informacji w
-    <a href="polityka-prywatnosci.html">polityce prywatności</a>.
+    Wyłącznie lokalnie na Twoim urządzeniu, w postaci zaszyfrowanej — więcej informacji
+    w <a href="polityka-prywatnosci.html">polityce prywatności</a>.
 </p>
 
 </body>

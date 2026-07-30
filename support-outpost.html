@@ -1,1 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support — Outpost</title>
+<style>
+    :root {
+        color-scheme: light dark;
+    }
+    html {
+        background: #ffffff;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+        line-height: 1.6;
+        color: #1c1c1e;
+        background: #ffffff;
+    }
+    h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+    }
+    h2 {
+        font-size: 1.15rem;
+        margin-top: 2rem;
+    }
+    .subtitle {
+        color: #8e8e93;
+        margin-top: 0;
+        margin-bottom: 2rem;
+    }
+    a {
+        color: #0a84ff;
+    }
+    .card {
+        border: 1px solid #e5e5ea;
+        background: #f2f2f7;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 1.5rem 0;
+    }
+    code {
+        font-size: 0.9em;
+        background: rgba(127, 127, 127, 0.15);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+    }
+    pre {
+        font-size: 0.85em;
+        background: rgba(127, 127, 127, 0.15);
+        border-radius: 8px;
+        padding: 12px 14px;
+        overflow-x: auto;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    ul {
+        padding-left: 1.25rem;
+    }
+    li {
+        margin-bottom: 0.4rem;
+    }
+    /* The dark-mode block MUST stay at the end of the sheet - otherwise later,
+       unconditional rules (e.g. .card above) override it in the CSS cascade
+       even while the browser is in dark mode. */
+    @media (prefers-color-scheme: dark) {
+        html {
+            background: #000000;
+        }
+        body {
+            color: #f2f2f7;
+            background: #000000;
+        }
+        a {
+            color: #0a84ff;
+        }
+        .card {
+            background: #1c1c1e;
+            border-color: #38383a;
+        }
+    }
+</style>
+</head>
+<body>
+
+<p><a href="wsparcie.html">Przeczytaj po polsku</a></p>
+
+<h1>Support — Outpost</h1>
+<p class="subtitle">Help, questions, and bug reports</p>
+
+<div class="card">
+    Have a question, a suggestion, or found a bug in Outpost? Email me directly:
+    <a href="mailto:marek.otulakowski@gmail.com">marek.otulakowski@gmail.com</a>. I usually
+    reply within a few days.
+</div>
+
+<h2>Connecting your server</h2>
+
+<p>
+    The simplest way is to log into your server in Outpost with the same account you already
+    administer it with — <strong>root</strong> (Proxmox/Linux) or <strong>Administrator</strong>
+    (Windows). This works right away, with no extra setup on the server. If you'd rather use an
+    account with limited permissions (recommended for production servers), that takes a few
+    extra, one-time steps described below.
+</p>
+
+<p><strong>Proxmox VE / PBS — API token or username/password?</strong></p>
+<p>
+    Fastest option: in the Add Endpoint form, choose the "Username/Password" login method and
+    enter <code>root@pam</code> with your Proxmox administrator password — works with zero setup
+    on the server.
+</p>
+<p>
+    If you'd rather use a read-only, limited-permission API token (a separate account instead of
+    root), run this on the Proxmox VE server (as root):
+</p>
+<pre><code>pveum user add outpost@pve --comment "Outpost (read-only)"
+pveum user token add outpost@pve outpost-token --comment "Outpost app"
+pveum acl modify / --users outpost@pve --roles PVEAuditor
+pveum acl modify / --tokens 'outpost@pve!outpost-token' --roles PVEAuditor</code></pre>
+<p>
+    The token's secret is shown only once — save it right away. In the app: type
+    <strong>Proxmox</strong>, token <code>outpost@pve!outpost-token=&lt;secret&gt;</code>
+    (note: Proxmox VE uses <code>=</code> between the token ID and the secret).
+</p>
+<p>
+    Proxmox Backup Server is analogous, with a different tool and a colon instead of an equals
+    sign:
+</p>
+<pre><code>proxmox-backup-manager user create outpost@pbs --comment "Outpost (read-only)"
+proxmox-backup-manager user generate-token outpost@pbs outpost-token
+proxmox-backup-manager acl update / Audit --auth-id outpost@pbs
+proxmox-backup-manager acl update / Audit --auth-id 'outpost@pbs!outpost-token'</code></pre>
+<p>
+    In the app: type <strong>Pbs</strong>, token
+    <code>outpost@pbs!outpost-token:&lt;secret&gt;</code>.
+</p>
+
+<p><strong>Windows Server — how do I set up SSH?</strong></p>
+<p>
+    On the server, as Administrator (PowerShell):
+</p>
+<pre><code>Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+Start-Service sshd
+Set-Service -Name sshd -StartupType 'Automatic'
+New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True `
+    -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\OpenSSH' -Name DefaultShell `
+    -Value 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'</code></pre>
+<p>
+    The simplest option is to connect with the <strong>Administrator</strong> account — it works
+    right away.
+</p>
+<p>
+    If you'd rather use a dedicated non-admin account, on top of the above you'll additionally
+    need: access to the <code>root\cimv2</code> WMI namespace ("Enable Account" + "Remote Enable"
+    permissions), adding the account to the local "Performance Monitor Users" group, and for
+    IIS/MSSQL monitoring specifically: <code>icacls "$env:windir\system32\inetsrv\config" /grant
+    "account:(OI)(CI)R"</code> (IIS) and creating a SQL Server login for that account
+    (<code>CREATE LOGIN [COMPUTER\account] FROM WINDOWS;</code> + the
+    <code>db_datareader</code> role). That's quite a bit of one-time setup — if you get stuck on
+    any step, email me and I'll send you the exact, ready-to-paste script.
+</p>
+
+<h2>Frequently asked questions</h2>
+
+<p><strong>An endpoint shows "Unreachable" — what should I do?</strong></p>
+<p>
+    Check that the server is powered on and reachable on the network from your device (same
+    Wi-Fi/VPN as the server, or a publicly reachable address), and that the credentials (SSH key,
+    password, API token) in the endpoint's settings are still current. You can check this with
+    the "Test connection" button while editing the endpoint.
+</p>
+
+<p><strong>I see a warning about a change in server identity (host key / certificate) — what does that mean?</strong></p>
+<p>
+    Outpost remembers ("pins") your server's SSH key or TLS certificate fingerprint the first
+    time it connects. If that fingerprint ever changes, you get a warning — this is usually the
+    result of reinstalling the OS or renewing a certificate on the server, but it's also exactly
+    the mechanism that protects you from someone impersonating your server. If you knowingly
+    changed the server yourself, accept the new fingerprint in the app.
+</p>
+
+<p><strong>What are the "Demo — Linux VPS" and "Demo — Windows Server" endpoints?</strong></p>
+<p>
+    These are two sample entries added automatically the first time you launch the app (or
+    whenever the endpoint list is empty), so you can immediately see what a working dashboard
+    looks like. They show locally-generated, sample data — they never connect to any real server
+    or network. Feel free to delete them.
+</p>
+
+<p><strong>I don't see the IIS / MSSQL sections on my Windows server.</strong></p>
+<p>
+    Those sections only appear if the monitored server actually has the IIS role or SQL Server
+    installed — if it doesn't, Outpost simply hides the corresponding section instead of showing
+    an error.
+</p>
+
+<p><strong>How do I change the app's language?</strong></p>
+<p>
+    Settings → Language. The change requires restarting the app to fully take effect.
+</p>
+
+<p><strong>Where is my data stored?</strong></p>
+<p>
+    Exclusively on your own device, in encrypted form — see the
+    <a href="privacy-policy.html">privacy policy</a> for details.
+</p>
+
+</body>
+</html>
 

@@ -1,1 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Outpost</title>
+<style>
+    :root {
+        color-scheme: light dark;
+    }
+    html {
+        background: #ffffff;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+        line-height: 1.6;
+        color: #1c1c1e;
+        background: #ffffff;
+    }
+    h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+    }
+    h2 {
+        font-size: 1.15rem;
+        margin-top: 2rem;
+    }
+    .subtitle {
+        color: #8e8e93;
+        margin-top: 0;
+        margin-bottom: 2rem;
+    }
+    a {
+        color: #0a84ff;
+    }
+    .card {
+        border: 1px solid #e5e5ea;
+        background: #f2f2f7;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 1.5rem 0;
+    }
+    code {
+        font-size: 0.9em;
+        background: rgba(127, 127, 127, 0.15);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+    }
+    ul {
+        padding-left: 1.25rem;
+    }
+    li {
+        margin-bottom: 0.4rem;
+    }
+    footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e5ea;
+        color: #8e8e93;
+        font-size: 0.9rem;
+    }
+    /* The dark-mode block MUST stay at the end of the sheet - otherwise later,
+       unconditional rules (e.g. .card above) override it in the CSS cascade
+       even while the browser is in dark mode. */
+    @media (prefers-color-scheme: dark) {
+        html {
+            background: #000000;
+        }
+        body {
+            color: #f2f2f7;
+            background: #000000;
+        }
+        a {
+            color: #0a84ff;
+        }
+        .card {
+            background: #1c1c1e;
+            border-color: #38383a;
+        }
+        footer {
+            border-top-color: #38383a;
+        }
+    }
+</style>
+</head>
+<body>
 
+<p><a href="polityka-prywatnosci.html">Przeczytaj po polsku</a></p>
+
+<h1>Privacy Policy — Outpost</h1>
+<p class="subtitle">Last updated: July 29, 2026</p>
+
+<div class="card">
+    <strong>In short:</strong> Outpost does not collect, store on any server of ours, or share
+    any personal data belonging to its users. There is no account, no login, no backend of ours.
+    All data you enter into the app — including SSH keys, API tokens, and passwords to your own
+    servers — stays exclusively on your device, in encrypted form.
+</div>
+
+<h2>1. Who we are</h2>
+<p>
+    Outpost is a mobile app for monitoring self-hosted infrastructure (Proxmox VE, Proxmox
+    Backup Server, and SSH-managed servers, including Linux and Windows Server), created and
+    maintained by Marek Otulakowski. This privacy policy applies solely to the Outpost app
+    available on the App Store and Google Play.
+</p>
+
+<h2>2. What data the app processes</h2>
+<p>
+    The app does not require creating an account or signing in. Data you configure in the
+    app — your servers' addresses and ports, display names, SSH keys, API tokens, usernames and
+    passwords for your own servers, SSH host key and TLS certificate fingerprints, and app
+    settings (theme, language, refresh interval, biometric lock) — is stored <strong>exclusively
+    locally on your device</strong>, in encrypted form (Keychain on iOS, a Keystore-backed
+    mechanism on Android). None of this data is ever sent to any server belonging to the app's
+    author, because no such server exists.
+</p>
+<p>
+    The app does not collect personal data (name, email address, phone number, user location),
+    does not use user accounts, displays no ads, and contains no analytics or tracking tools of
+    any kind.
+</p>
+
+<h2>3. What the app connects to</h2>
+<p>
+    The only network connections Outpost makes go directly from your device — with no server of
+    the app's author acting as an intermediary:
+</p>
+<ul>
+    <li>
+        <strong>Servers you configure yourself</strong> (Proxmox VE, Proxmox Backup Server, SSH
+        hosts) — the connection is made exclusively from your device directly to your server,
+        using the credentials you provide.
+    </li>
+    <li>
+        <strong>ipapi.co</strong> — a best-effort location lookup (city/region/country) for a
+        monitored server, shown on that server's detail page. Only the server's host/address is
+        sent, no other data.
+    </li>
+    <li>
+        <strong>api.ipify.org</strong> and <strong>dynupdate.no-ip.com</strong> — used only if you
+        enable the optional Dynamic DNS (No-IP) feature and provide your own No-IP account
+        credentials in it. Used to check your device's public IP address and report it to No-IP
+        when it changes. This feature is off by default.
+    </li>
+</ul>
+<p>
+    How these external services (ipapi.co, No-IP) process data is governed by their own respective
+    privacy policies.
+</p>
+
+<h2>4. Optional iCloud sync</h2>
+<p>
+    If you enable the optional (off by default) iCloud sync, your app settings are synced between
+    your own iOS devices via your own iCloud account. This process takes place entirely within
+    Apple's infrastructure, under the terms of Apple's own privacy policy — the app's author has
+    no access to this data.
+</p>
+
+<h2>5. Data export and import</h2>
+<p>
+    The app lets you export all of its data (endpoints, credentials, keys) into a single
+    encrypted file, protected by a passphrase you choose yourself. You decide where to save that
+    file or who to share it with (e.g. to move your data to a new device) — the app's author has
+    no access to it.
+</p>
+
+<h2>6. Biometric lock</h2>
+<p>
+    If you enable the optional biometric lock, authentication (Face ID / Touch ID / device
+    passcode) happens entirely through standard iOS/Android system mechanisms. The app never has
+    access to your biometric data itself — the operating system only returns a yes/no result to it.
+</p>
+
+<h2>7. Sharing data with third parties</h2>
+<p>
+    Outpost does not share, sell, or transfer any user data to third parties, because it does not
+    collect any on a server of its own — there is simply nothing to share.
+</p>
+
+<h2>8. Data retention and deletion</h2>
+<p>
+    You can edit or delete any endpoint, key, identity, or token at any time directly in the app.
+    Uninstalling the app permanently deletes all locally stored data (aside from an iCloud copy,
+    if you knowingly enabled sync — you can remove that from your device's iCloud settings).
+</p>
+
+<h2>9. Children's privacy</h2>
+<p>
+    Outpost is not directed at children and does not knowingly collect data from anyone of any
+    age, since it doesn't collect personal data at all.
+</p>
+
+<h2>10. Changes to this privacy policy</h2>
+<p>
+    If how the app works changes in the future (e.g. new features requiring data processing are
+    added), this policy will be updated accordingly, along with the date at the top of the page.
+</p>
+
+<h2>11. Contact</h2>
+<p>
+    For anything related to this privacy policy, you can reach the app's author at:
+    <a href="mailto:marek.otulakowski@gmail.com">marek.otulakowski@gmail.com</a>.
+</p>
+
+<footer>
+    Outpost — an app for monitoring self-hosted infrastructure.
+</footer>
+
+</body>
+</html>

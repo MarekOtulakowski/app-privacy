@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Polityka prywatności — Outpost</title>
+<title>Wsparcie — Outpost</title>
 <style>
     :root {
         color-scheme: light dark;
@@ -49,18 +49,22 @@
         padding: 0.1em 0.35em;
         border-radius: 4px;
     }
+    pre {
+        font-size: 0.85em;
+        background: rgba(127, 127, 127, 0.15);
+        border-radius: 8px;
+        padding: 12px 14px;
+        overflow-x: auto;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
     ul {
         padding-left: 1.25rem;
     }
     li {
         margin-bottom: 0.4rem;
-    }
-    footer {
-        margin-top: 3rem;
-        padding-top: 1rem;
-        border-top: 1px solid #e5e5ea;
-        color: #8e8e93;
-        font-size: 0.9rem;
     }
     /* Blok trybu ciemnego MUSI być na końcu arkusza - inaczej późniejsze,
        niewarunkowe reguły (np. .card powyżej) nadpisują go w kaskadzie CSS
@@ -80,144 +84,137 @@
             background: #1c1c1e;
             border-color: #38383a;
         }
-        footer {
-            border-top-color: #38383a;
-        }
     }
 </style>
 </head>
 <body>
 
-<h1>Polityka prywatności — Outpost</h1>
-<p class="subtitle">Ostatnia aktualizacja: 29 lipca 2026</p>
+<p><a href="support.html">Read this in English</a></p>
+
+<h1>Wsparcie — Outpost</h1>
+<p class="subtitle">Pomoc, pytania i zgłaszanie problemów</p>
 
 <div class="card">
-    <strong>W skrócie:</strong> Outpost nie zbiera, nie przechowuje na żadnym naszym
-    serwerze ani nie udostępnia jakichkolwiek danych osobowych swoich użytkowników.
-    Nie ma konta, nie ma logowania, nie ma naszego backendu. Wszystkie dane, które
-    wpisujesz w aplikacji — w tym klucze SSH, tokeny API i hasła do Twoich własnych
-    serwerów — pozostają wyłącznie na Twoim urządzeniu, w postaci zaszyfrowanej.
+    Masz pytanie, sugestię albo napotkałeś błąd w aplikacji Outpost? Napisz do mnie
+    bezpośrednio: <a href="mailto:marek.otulakowski@gmail.com">marek.otulakowski@gmail.com</a>.
+    Odpisuję zwykle w ciągu kilku dni.
 </div>
 
-<h2>1. Kim jesteśmy</h2>
+<h2>Jak podłączyć swój serwer</h2>
+
 <p>
-    Outpost to aplikacja mobilna do monitorowania samodzielnie hostowanej infrastruktury
-    (Proxmox VE, Proxmox Backup Server oraz serwery zarządzane przez SSH, w tym Linux
-    i Windows Server), stworzona i utrzymywana przez Marka Otulakowskiego. Niniejsza
-    polityka prywatności dotyczy wyłącznie aplikacji Outpost dostępnej w App Store
-    i Google Play.
+    Najprościej jest zalogować się do swojego serwera w Outpost tym samym kontem, którym
+    już się administrujesz — <strong>root</strong> (Proxmox/Linux) albo
+    <strong>Administrator</strong> (Windows). Zadziała od razu, bez dodatkowej konfiguracji
+    po stronie serwera. Jeśli wolisz używać konta o ograniczonych uprawnieniach (zalecane
+    dla serwerów produkcyjnych), wymaga to kilku dodatkowych, jednorazowych kroków
+    opisanych poniżej.
 </p>
 
-<h2>2. Jakie dane przetwarza aplikacja</h2>
+<p><strong>Proxmox VE / PBS — token API czy login/hasło?</strong></p>
 <p>
-    Aplikacja nie wymaga zakładania konta ani logowania. Dane, które konfigurujesz
-    w aplikacji — adresy i porty Twoich serwerów, nazwy wyświetlane, klucze SSH, tokeny
-    API, loginy i hasła do Twoich własnych serwerów, odciski palca kluczy hosta SSH
-    i certyfikatów TLS, oraz ustawienia aplikacji (motyw, język, interwał odświeżania,
-    blokada biometryczna) — są zapisywane <strong>wyłącznie lokalnie na Twoim
-    urządzeniu</strong>, w zaszyfrowanej formie (Keychain na iOS, mechanizm oparty
-    o Keystore na Androidzie). Żadne z tych danych nie są wysyłane na jakikolwiek
-    serwer należący do autora aplikacji, ponieważ taki serwer nie istnieje.
+    Najszybciej: w formularzu dodawania endpointu wybierz metodę logowania
+    "Username/Password" i podaj <code>root@pam</code> z hasłem administratora Proxmoxa —
+    zadziała bez żadnej konfiguracji po stronie serwera.
 </p>
 <p>
-    Aplikacja nie zbiera danych osobowych (imienia, adresu e-mail, numeru telefonu,
-    lokalizacji użytkownika), nie korzysta z kont użytkowników, nie wyświetla reklam
-    i nie zawiera żadnych narzędzi analitycznych ani śledzących.
+    Jeśli wolisz token API o ograniczonych, tylko-do-odczytu uprawnieniach (osobne konto
+    zamiast root), uruchom na serwerze Proxmox VE (jako root):
 </p>
-
-<h2>3. Do czego łączy się aplikacja</h2>
+<pre><code>pveum user add outpost@pve --comment "Outpost (read-only)"
+pveum user token add outpost@pve outpost-token --comment "Outpost app"
+pveum acl modify / --users outpost@pve --roles PVEAuditor
+pveum acl modify / --tokens 'outpost@pve!outpost-token' --roles PVEAuditor</code></pre>
 <p>
-    Jedyne połączenia sieciowe, jakie nawiązuje Outpost, prowadzą bezpośrednio
-    z Twojego urządzenia — bez pośrednictwa jakiegokolwiek serwera autora aplikacji:
+    Sekret tokenu jest pokazany tylko raz — zapisz go od razu. W aplikacji: typ
+    <strong>Proxmox</strong>, token <code>outpost@pve!outpost-token=&lt;sekret&gt;</code>
+    (uwaga: Proxmox VE używa znaku <code>=</code> między ID tokenu a sekretem).
 </p>
-<ul>
-    <li>
-        <strong>Serwery, które sam skonfigurujesz</strong> (Proxmox VE, Proxmox Backup
-        Server, hosty SSH) — połączenie następuje wyłącznie z Twojego urządzenia
-        bezpośrednio do Twojego serwera, przy użyciu podanych przez Ciebie danych
-        logowania.
-    </li>
-    <li>
-        <strong>ipapi.co</strong> — orientacyjne wyszukanie lokalizacji (miasto/region/kraj)
-        monitorowanego serwera, wyświetlane na stronie jego szczegółów. Wysyłany jest
-        wyłącznie adres/nazwa hosta serwera, bez żadnych innych danych.
-    </li>
-    <li>
-        <strong>api.ipify.org</strong> i <strong>dynupdate.no-ip.com</strong> — używane
-        wyłącznie, jeśli włączysz opcjonalną funkcję Dynamic DNS (No-IP) i podasz w niej
-        własne dane konta No-IP. Służą do sprawdzenia publicznego adresu IP Twojego
-        urządzenia i zgłoszenia go do No-IP, gdy się zmieni. Ta funkcja jest domyślnie
-        wyłączona.
-    </li>
-</ul>
 <p>
-    Sposób przetwarzania danych przez powyższe usługi zewnętrzne (ipapi.co, No-IP)
-    podlega ich własnym politykom prywatności.
+    Dla Proxmox Backup Server analogicznie, innym narzędziem i z dwukropkiem zamiast
+    znaku równości:
+</p>
+<pre><code>proxmox-backup-manager user create outpost@pbs --comment "Outpost (read-only)"
+proxmox-backup-manager user generate-token outpost@pbs outpost-token
+proxmox-backup-manager acl update / Audit --auth-id outpost@pbs
+proxmox-backup-manager acl update / Audit --auth-id 'outpost@pbs!outpost-token'</code></pre>
+<p>
+    W aplikacji: typ <strong>Pbs</strong>, token
+    <code>outpost@pbs!outpost-token:&lt;sekret&gt;</code>.
 </p>
 
-<h2>4. Opcjonalna synchronizacja iCloud</h2>
+<p><strong>Windows Server — jak skonfigurować SSH?</strong></p>
 <p>
-    Jeśli włączysz opcjonalną (domyślnie wyłączoną) synchronizację iCloud, Twoje
-    ustawienia aplikacji są synchronizowane pomiędzy Twoimi własnymi urządzeniami iOS
-    za pośrednictwem Twojego własnego konta iCloud. Ten proces odbywa się w całości
-    w infrastrukturze Apple, na zasadach opisanych w polityce prywatności Apple —
-    autor aplikacji nie ma dostępu do tych danych.
+    Na serwerze, jako Administrator (PowerShell):
+</p>
+<pre><code>Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+Start-Service sshd
+Set-Service -Name sshd -StartupType 'Automatic'
+New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True `
+    -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\OpenSSH' -Name DefaultShell `
+    -Value 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'</code></pre>
+<p>
+    Najprościej jest połączyć się kontem <strong>Administrator</strong> — zadziała od razu.
+</p>
+<p>
+    Jeśli wolisz dedykowane konto bez uprawnień administratora, poza powyższym potrzebne
+    jest dodatkowo: nadanie dostępu do przestrzeni nazw WMI <code>root\cimv2</code>
+    (uprawnienia "Enable Account" + "Remote Enable"), dodanie konta do lokalnej grupy
+    "Użytkownicy monitora wydajności" (Performance Monitor Users), a dla monitorowania
+    IIS/MSSQL dodatkowo: <code>icacls "$env:windir\system32\inetsrv\config" /grant
+    "konto:(OI)(CI)R"</code> (IIS) oraz utworzenie loginu SQL Server dla tego konta
+    (<code>CREATE LOGIN [KOMPUTER\konto] FROM WINDOWS;</code> + rola
+    <code>db_datareader</code>). To sporo jednorazowej konfiguracji — jeśli utkniesz na
+    którymś kroku, napisz do mnie, podeślę dokładny, gotowy do wklejenia skrypt.
 </p>
 
-<h2>5. Eksport i import danych</h2>
+<h2>Najczęstsze pytania</h2>
+
+<p><strong>Endpoint pokazuje "Unreachable" — co robić?</strong></p>
 <p>
-    Aplikacja pozwala wyeksportować wszystkie dane (endpointy, dane logowania, klucze)
-    do jednego zaszyfrowanego pliku, chronionego hasłem, które sam ustalasz. Ty
-    decydujesz, gdzie taki plik zapisać lub komu go przekazać (np. żeby przenieść dane
-    na nowe urządzenie) — autor aplikacji nie ma do niego dostępu.
+    Sprawdź, czy serwer jest włączony i osiągalny w sieci z Twojego urządzenia (ten sam
+    Wi-Fi/VPN co serwer, albo publicznie dostępny adres), oraz czy dane logowania
+    (klucz SSH, hasło, token API) w ustawieniach endpointu są aktualne. Możesz to
+    sprawdzić przyciskiem "Test connection" w edycji endpointu.
 </p>
 
-<h2>6. Blokada biometryczna</h2>
+<p><strong>Widzę ostrzeżenie o zmianie tożsamości serwera (host key / certyfikat) — co to znaczy?</strong></p>
 <p>
-    Jeśli włączysz opcjonalną blokadę biometryczną, uwierzytelnianie (Face ID / Touch ID
-    / kod urządzenia) odbywa się w całości przy użyciu standardowych mechanizmów
-    systemowych iOS/Android. Aplikacja nigdy nie ma dostępu do Twoich danych
-    biometrycznych — system operacyjny zwraca jej wyłącznie wynik "tak/nie".
+    Outpost zapamiętuje ("przypina") odcisk palca klucza SSH albo certyfikatu TLS
+    Twojego serwera przy pierwszym połączeniu. Jeśli ten odcisk się zmieni, dostajesz
+    ostrzeżenie — to zwykle efekt reinstalacji systemu albo odnowienia certyfikatu na
+    serwerze, ale to też dokładnie ten mechanizm chroni Cię przed podszywaniem się pod
+    Twój serwer. Jeśli sam świadomie zmieniłeś serwer, zaakceptuj nowy odcisk w
+    aplikacji.
 </p>
 
-<h2>7. Udostępnianie danych stronom trzecim</h2>
+<p><strong>Czym są endpointy "Demo — Linux VPS" i "Demo — Windows Server"?</strong></p>
 <p>
-    Outpost nie udostępnia, nie sprzedaje ani nie przekazuje żadnych danych użytkownika
-    stronom trzecim, ponieważ nie gromadzi ich na żadnym własnym serwerze — nie ma więc
-    czego udostępniać.
+    To dwa przykładowe wpisy dodawane automatycznie przy pierwszym uruchomieniu (albo
+    gdy lista endpointów jest pusta), żeby od razu zobaczyć jak wygląda działający
+    dashboard. Pokazują lokalnie wygenerowane, przykładowe dane — nie łączą się z
+    żadnym prawdziwym serwerem ani siecią. Możesz je swobodnie usunąć.
 </p>
 
-<h2>8. Przechowywanie i usuwanie danych</h2>
+<p><strong>Nie widzę sekcji IIS / MSSQL na moim serwerze Windows.</strong></p>
 <p>
-    Każdy endpoint, klucz, tożsamość i token możesz w każdej chwili edytować lub usunąć
-    bezpośrednio w aplikacji. Odinstalowanie aplikacji z urządzenia trwale usuwa
-    wszystkie lokalnie zapisane dane (poza kopią w iCloud, jeśli świadomie włączyłeś
-    synchronizację — tę możesz usunąć w ustawieniach iCloud swojego urządzenia).
+    Te sekcje pojawiają się tylko, jeśli na monitorowanym serwerze faktycznie
+    zainstalowano rolę IIS albo SQL Server — jeśli ich nie ma, Outpost po prostu ukrywa
+    odpowiednią sekcję zamiast pokazywać błąd.
 </p>
 
-<h2>9. Prywatność dzieci</h2>
+<p><strong>Jak zmienić język aplikacji?</strong></p>
 <p>
-    Outpost nie jest kierowany do dzieci i nie zbiera świadomie żadnych danych od osób
-    w jakimkolwiek wieku, ponieważ nie zbiera danych osobowych w ogóle.
+    Ustawienia → Język. Zmiana wymaga ponownego uruchomienia aplikacji, żeby w pełni
+    się zastosowała.
 </p>
 
-<h2>10. Zmiany w polityce prywatności</h2>
+<p><strong>Gdzie są przechowywane moje dane?</strong></p>
 <p>
-    Jeśli w przyszłości zmieni się sposób działania aplikacji (np. zostaną dodane
-    funkcje wymagające przetwarzania danych), niniejsza polityka zostanie odpowiednio
-    zaktualizowana wraz z datą na górze strony.
+    Wyłącznie lokalnie na Twoim urządzeniu, w postaci zaszyfrowanej — więcej informacji
+    w <a href="polityka-prywatnosci.html">polityce prywatności</a>.
 </p>
-
-<h2>11. Kontakt</h2>
-<p>
-    W sprawach związanych z niniejszą polityką prywatności możesz skontaktować się
-    z autorem aplikacji pod adresem:
-    <a href="mailto:marek.otulakowski@gmail.com">marek.otulakowski@gmail.com</a>.
-</p>
-
-<footer>
-    Outpost — aplikacja do monitorowania samodzielnie hostowanej infrastruktury.
-</footer>
 
 </body>
 </html>

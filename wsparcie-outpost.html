@@ -49,6 +49,17 @@
         padding: 0.1em 0.35em;
         border-radius: 4px;
     }
+    pre {
+        font-size: 0.85em;
+        background: rgba(127, 127, 127, 0.15);
+        border-radius: 8px;
+        padding: 12px 14px;
+        overflow-x: auto;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
     ul {
         padding-left: 1.25rem;
     }
@@ -78,6 +89,8 @@
 </head>
 <body>
 
+<p><a href="https://marekotulakowski.github.io/app-privacy/support-outpost.html">Read this in English</a></p>
+
 <h1>Wsparcie — Outpost</h1>
 <p class="subtitle">Pomoc, pytania i zgłaszanie problemów</p>
 
@@ -86,6 +99,75 @@
     bezpośrednio: <a href="mailto:marek.otulakowski@gmail.com">marek.otulakowski@gmail.com</a>.
     Odpisuję zwykle w ciągu kilku dni.
 </div>
+
+<h2>Jak podłączyć swój serwer</h2>
+
+<p>
+    Najprościej jest zalogować się do swojego serwera w Outpost tym samym kontem, którym
+    już się administrujesz — <strong>root</strong> (Proxmox/Linux) albo
+    <strong>Administrator</strong> (Windows). Zadziała od razu, bez dodatkowej konfiguracji
+    po stronie serwera. Jeśli wolisz używać konta o ograniczonych uprawnieniach (zalecane
+    dla serwerów produkcyjnych), wymaga to kilku dodatkowych, jednorazowych kroków
+    opisanych poniżej.
+</p>
+
+<p><strong>Proxmox VE / PBS — token API czy login/hasło?</strong></p>
+<p>
+    Najszybciej: w formularzu dodawania endpointu wybierz metodę logowania
+    "Username/Password" i podaj <code>root@pam</code> z hasłem administratora Proxmoxa —
+    zadziała bez żadnej konfiguracji po stronie serwera.
+</p>
+<p>
+    Jeśli wolisz token API o ograniczonych, tylko-do-odczytu uprawnieniach (osobne konto
+    zamiast root), uruchom na serwerze Proxmox VE (jako root):
+</p>
+<pre><code>pveum user add outpost@pve --comment "Outpost (read-only)"
+pveum user token add outpost@pve outpost-token --comment "Outpost app"
+pveum acl modify / --users outpost@pve --roles PVEAuditor
+pveum acl modify / --tokens 'outpost@pve!outpost-token' --roles PVEAuditor</code></pre>
+<p>
+    Sekret tokenu jest pokazany tylko raz — zapisz go od razu. W aplikacji: typ
+    <strong>Proxmox</strong>, token <code>outpost@pve!outpost-token=&lt;sekret&gt;</code>
+    (uwaga: Proxmox VE używa znaku <code>=</code> między ID tokenu a sekretem).
+</p>
+<p>
+    Dla Proxmox Backup Server analogicznie, innym narzędziem i z dwukropkiem zamiast
+    znaku równości:
+</p>
+<pre><code>proxmox-backup-manager user create outpost@pbs --comment "Outpost (read-only)"
+proxmox-backup-manager user generate-token outpost@pbs outpost-token
+proxmox-backup-manager acl update / Audit --auth-id outpost@pbs
+proxmox-backup-manager acl update / Audit --auth-id 'outpost@pbs!outpost-token'</code></pre>
+<p>
+    W aplikacji: typ <strong>Pbs</strong>, token
+    <code>outpost@pbs!outpost-token:&lt;sekret&gt;</code>.
+</p>
+
+<p><strong>Windows Server — jak skonfigurować SSH?</strong></p>
+<p>
+    Na serwerze, jako Administrator (PowerShell):
+</p>
+<pre><code>Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+Start-Service sshd
+Set-Service -Name sshd -StartupType 'Automatic'
+New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True `
+    -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\OpenSSH' -Name DefaultShell `
+    -Value 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'</code></pre>
+<p>
+    Najprościej jest połączyć się kontem <strong>Administrator</strong> — zadziała od razu.
+</p>
+<p>
+    Jeśli wolisz dedykowane konto bez uprawnień administratora, poza powyższym potrzebne
+    jest dodatkowo: nadanie dostępu do przestrzeni nazw WMI <code>root\cimv2</code>
+    (uprawnienia "Enable Account" + "Remote Enable"), dodanie konta do lokalnej grupy
+    "Użytkownicy monitora wydajności" (Performance Monitor Users), a dla monitorowania
+    IIS/MSSQL dodatkowo: <code>icacls "$env:windir\system32\inetsrv\config" /grant
+    "konto:(OI)(CI)R"</code> (IIS) oraz utworzenie loginu SQL Server dla tego konta
+    (<code>CREATE LOGIN [KOMPUTER\konto] FROM WINDOWS;</code> + rola
+    <code>db_datareader</code>). To sporo jednorazowej konfiguracji — jeśli utkniesz na
+    którymś kroku, napisz do mnie, podeślę dokładny, gotowy do wklejenia skrypt.
+</p>
 
 <h2>Najczęstsze pytania</h2>
 
@@ -131,7 +213,7 @@
 <p><strong>Gdzie są przechowywane moje dane?</strong></p>
 <p>
     Wyłącznie lokalnie na Twoim urządzeniu, w postaci zaszyfrowanej — więcej informacji
-    w <a href="polityka-prywatnosci-outpost.html">polityce prywatności</a>.
+    w <a href="polityka-prywatnosci.html">polityce prywatności</a>.
 </p>
 
 </body>
